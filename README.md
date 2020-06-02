@@ -52,7 +52,7 @@ ETLPipeline:
 
 
  # Project Structure
-- create_tables.py - Script will drop old tables (if exist) ad re-create new tables
+- create_tables.py - Script will drop old tables (if exist), and create new tables
 - etl.py - Script will executes the queries that extract JSON data from the S3 bucket and ingest them to Redshift
 - sql_queries.py - File that contains variables with SQL statement in String formats, partitioned by CREATE, DROP, COPY and INSERT statements
 - dhw.cfg - Configuration file used that contains info about Redshift, IAM and S3

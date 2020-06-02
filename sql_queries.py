@@ -61,9 +61,9 @@ songplay_table_create = ("""CREATE TABLE IF NOT EXISTS songplay(
                             start_time TIMESTAMP,
                             user_id INTEGER NOT NULL,
                             level TEXT,
-                            song_id TEXT,
-                            artist_id TEXT,
-                            session_id INTEGER,
+                            song_id TEXT NOT NULL,
+                            artist_id TEXT NOT NULL,
+                            session_id INTEGER NOT NULL,
                             location TEXT,
                             user_agent TEXT
                         )
@@ -123,7 +123,7 @@ staging_songs_copy = ("""copy staging_songs
 # FINAL TABLES
 
 songplay_table_insert = ("""INSERT INTO songplay(start_time, user_id, level, song_id, artist_id, session_id, location, user_agent)
-                            SELECT  timestamp 'epoch' + se.ts/1000 * interval '1 second' as start_time, se.user_id, se.level, 
+                            SELECT  distinct timestamp 'epoch' + se.ts/1000 * interval '1 second' as start_time, se.user_id, se.level, 
                                     ss.song_id, ss.artist_id, se.session_id, se.location, se.user_agent
                             FROM staging_events se, staging_songs ss
                             WHERE se.page = 'NextSong' AND
@@ -139,7 +139,7 @@ user_table_insert = ("""INSERT INTO users(user_id, first_name, last_name, gender
 """)
 
 song_table_insert = ("""INSERT INTO song(song_id, title, artist_id, year, duration)
-                        SELECT song_id, title, artist_id, year, duration
+                        SELECT distinct song_id, title, artist_id, year, duration
                         FROM staging_songs
                         WHERE song_id IS NOT NULL
 """)
@@ -151,7 +151,7 @@ artist_table_insert = ("""INSERT INTO artist(artist_id, name, location, latitude
 """)
 
 time_table_insert = ("""INSERT INTO time(start_time, hour, day, week, month, year, weekDay)
-                        SELECT start_time, extract(hour from start_time), extract(day from start_time),
+                        SELECT distinct start_time, extract(hour from start_time), extract(day from start_time),
                                 extract(week from start_time), extract(month from start_time),
                                 extract(year from start_time), extract(dayofweek from start_time)
                         FROM songplay
